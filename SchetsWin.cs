@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-
 public class SchetsWin : Form
 {   
     MenuStrip menuStrip;
@@ -33,16 +32,52 @@ public class SchetsWin : Form
         this.Close();
     }
 
+private void opslaan(object obj, EventArgs ea)
+    {
+        SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+        saveFileDialog1.Filter = "Bitmap Image|*.bmp|JPEG Image|*.jpg|PNG Image|*.png";
+        saveFileDialog1.Title = "Sla je plaatje op";
+        saveFileDialog1.ShowDialog();
+
+        if (saveFileDialog1.FileName != "")
+        {
+            System.IO.FileStream fs =
+               (System.IO.FileStream)saveFileDialog1.OpenFile();
+            switch (saveFileDialog1.FilterIndex)
+            {
+                case 1:
+                    this.schetscontrol.Schets.bitmap.Save(fs,
+                       System.Drawing.Imaging.ImageFormat.Bmp);
+                    break;
+
+                case 2:
+                    this.schetscontrol.Schets.bitmap.Save(fs,
+                       System.Drawing.Imaging.ImageFormat.Jpeg);
+                    break;
+
+                case 3:
+                    this.schetscontrol.Schets.bitmap.Save(fs,
+                       System.Drawing.Imaging.ImageFormat.Png);
+                    break;
+            }
+
+            fs.Close();
+        }
+    }
+
     public SchetsWin()
     {
         ISchetsTool[] deTools = { new PenTool()         
                                 , new LijnTool()
                                 , new RechthoekTool()
                                 , new VolRechthoekTool()
+                                , new CirkelTool()
+                                , new VolCirkelTool()
                                 , new TekstTool()
                                 , new GumTool()
                                 };
         String[] deKleuren = { "Black", "Red", "Green", "Blue", "Yellow", "Magenta", "Cyan" };
+        String[] meerKleuren = { "AliceBlue", "AntiqueWhite", "Aqua", "Aquamarine", "Azure", "Beige", "Bisque", "BlanchedAlmond", "BurlyWood", "CadetBlue", "Chartreuse", "Chocolate", "Coral", "CornflowerBlue", "Cornsilk", "Crimson", "DarkBlue", "DarkCyan", "DarkGoldenrod", "DarkGray", "DarkGreen", "DarkKhaki", "DarkMagenta", "DarkOliveGreen", "DarkOrange", "DarkOrchid", "DarkRed", "DarkSalmon", "DarkSeaGreen", "DarkSlateBlue", "DarkSlateGray", "DarkTurquoise", "DarkViolet", "DeepPink", "DeepSkyBlue", "DimGray", "DodgerBlue", "FireBrick", "FloralWhite", "ForestGreen", "Gainsboro", "GhostWhite", "Gold", "Goldenrod", "GreenYellow", "Honeydew", "HotPink", "IndianRed", "Indigo", "Ivory", "Khaki", "Lavender", "LavenderBlush", "LawnGreen", "LemonChiffon", "LightBlue", "LightCoral", "LightCyan", "LightGoldenrodYellow", "LightGray", "LightGreen", "LightPink", "LightSalmon", "LightSeaGreen", "LightSkyBlue", "LightSlateGray", "LightSteelBlue", "LightYellow", "Lime", "LimeGreen", "Linen", "Maroon", "MediumAquamarine", "MediumBlue", "MediumOrchid", "MediumPurple", "MediumSeaGreen", "MediumSlateBlue", "MediumSpringGreen", "MediumTurquoise", "MediumVioletRed", "MidnightBlue", "MintCream", "MistyRose", "Moccasin", "NavajoWhite", "Navy", "OldLace", "Olive", "OliveDrab", "OrangeRed", "Orchid", "PaleGoldenrod", "PaleGreen", "PaleTurquoise", "PaleVioletRed", "PapayaWhip", "PeachPuff", "Peru", "Plum", "PowderBlue", "RosyBrown", "RoyalBlue", "SaddleBrown", "Salmon", "SandyBrown", "SeaGreen", "Seashell", "Sienna", "Silver", "SkyBlue", "SlateBlue", "SlateGray", "Snow", "SpringGreen", "SteelBlue", "Tan", "Teal", "Thistle", "Tomato", "Turquoise", "Violet", "Wheat", "WhiteSmoke", "YellowGreen" };
 
         this.ClientSize = new Size(700, 500);
         huidigeTool = deTools[0];
@@ -72,9 +107,9 @@ public class SchetsWin : Form
         this.Controls.Add(menuStrip);
         this.maakFileMenu();
         this.maakToolMenu(deTools);
-        this.maakActieMenu(deKleuren);
+        this.maakActieMenu(meerKleuren);
         this.maakToolButtons(deTools);
-        this.maakActieButtons(deKleuren);
+        this.maakActieButtons(meerKleuren);
         this.Resize += this.veranderAfmeting;
         this.veranderAfmeting(null, null);
     }
@@ -83,6 +118,7 @@ public class SchetsWin : Form
     {   
         ToolStripMenuItem menu = new ToolStripMenuItem("File");
         menu.MergeAction = MergeAction.MatchOnly;
+        menu.DropDownItems.Add("opslaan", null, this.opslaan);
         menu.DropDownItems.Add("Sluiten", null, this.afsluiten);
         menuStrip.Items.Add(menu);
     }
