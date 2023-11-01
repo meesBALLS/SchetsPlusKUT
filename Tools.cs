@@ -196,31 +196,70 @@ public class GumTool : PenTool
 
         int boven = Math.Abs((x2-x1)*(y1-y)-(x1-x)*(y2-y1));
         int onder = (int)Math.Sqrt(Math.Pow(y2 - y1, 2) + Math.Pow(x2 - x1, 2));
+        if (onder == 0)
+        {
+            onder = 1;
+        }
         return boven / onder;
+    }
+
+    public bool PuntOpEllips(Point p, double middenx, double middeny, double radiusx, double radiusy, double delta)
+    {
+        double resultaat = (Math.Pow(p.X-middenx,2)/ Math.Pow(radiusx, 2))+ (Math.Pow(p.Y - middeny, 2) / Math.Pow(radiusy, 2));
+        return (1 - delta <= resultaat && resultaat <= 1 + delta);
     }
 
     public bool Raak(string soort, Point begin, Point eind, Point p)
     {
+        double afstand = PuntLijnAfstand(begin, eind, p);
+        double radiusx = Math.Abs((double)eind.X - (double)begin.X) / 2.0;
+        double radiusy = Math.Abs((double)eind.Y - (double)begin.Y) / 2.0;
+        double midpointx = ((double)begin.X + (double)eind.X) / 2.0;
+        double midpointy = ((double)begin.Y + (double)eind.Y) / 2.0;
         switch (soort)
         {
             case ("kader"):
-
+                int breedte = Math.Abs(begin.X - eind.X);
+                int hoogte = Math.Abs(begin.Y - eind.Y);
+                Tuple<Point, Point> lijn1 = new Tuple<Point, Point>(begin, new Point(begin.X, begin.Y + hoogte));
+                Tuple<Point, Point> lijn2 = new Tuple<Point, Point>(new Point(begin.X, begin.Y + hoogte), new Point(begin.X + breedte, begin.Y + hoogte));
+                Tuple<Point, Point> lijn3 = new Tuple<Point, Point>(new Point(begin.X + breedte, begin.Y + hoogte), new Point(begin.X + breedte, begin.Y));
+                Tuple<Point, Point> lijn4 = new Tuple<Point, Point>(new Point(begin.X + breedte, begin.Y), begin);
+                if (PuntLijnAfstand(lijn1.Item1, lijn1.Item2, p) <= 8)
+                {
+                    return true;
+                }
+                else if (PuntLijnAfstand(lijn2.Item1, lijn2.Item2, p) <= 8)
+                {
+                    return true;
+                }
+                else if (PuntLijnAfstand(lijn3.Item1, lijn3.Item2, p) <= 8)
+                {
+                    return true;
+                }
+                else if (PuntLijnAfstand(lijn4.Item1, lijn4.Item2, p) <= 8)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            case ("cirkel"):
+                return (PuntOpEllips(p, midpointx, midpointy, radiusx, radiusy, 24/radiusx));
             case ("vlak"):
+                vlakshit:
                 return (p.X > begin.X && p.X < eind.X && p.Y > begin.Y && p.Y < eind.Y);
             case ("volcirkel"):
-                double radiusx = Math.Abs((double)eind.X - (double)begin.X) / 2.0;
-                double radiusy = Math.Abs((double)eind.Y - (double)begin.Y) / 2.0;
-                double midpointx = ((double)begin.X + (double)eind.X) / 2.0;
-                double midpointy = ((double)begin.Y + (double)eind.Y) / 2.0;
-
                 return ((Math.Pow((p.X - midpointx) / radiusx, 2) + Math.Pow((p.Y - midpointy) / radiusy, 2)) <= 1.0);
             case ("lijn"):
                 sameshit:
-                int afstand = (int)PuntLijnAfstand(begin, eind, p);
-                return (afstand <= 5);
-
+                Console.WriteLine(afstand);
+                return (afstand <= 8);
             case ("pen"):
                 goto sameshit;
+            case ("tekst"):
+                goto vlakshit;
             default:
                 return false;
         }
@@ -228,63 +267,17 @@ public class GumTool : PenTool
 
     public override void MuisLos(SchetsControl s, Point p)
     {
-        // schrijf hier de logica voor het verwijderen van een object en die daaronder opnieuw tekenen
-        // dit kan met een for loop die door de getekendelijst loopt en het object verwijderd waar p in zit of erg dichtbij is
         for (int i = 0; i < s.Schets.Getekendelijst.Count; i++)
         {
             string soort = s.Schets.getekendelijst[i].soort;
-            switch (soort)
+            Point beginpunt = s.Schets.Getekendelijst[i].beginpunt;
+            Point eindpunt = s.Schets.Getekendelijst[i].eindpunt;
+
+            if (Raak(soort, beginpunt, eindpunt, p))
             {
-                case ("kader"):
-                    Point beginpunt = s.Schets.Getekendelijst[i].beginpunt;
-                    Point eindpunt = s.Schets.Getekendelijst[i].eindpunt;
-
-                    if (Raak(soort, beginpunt, eindpunt, p))
-                    {
-                        s.Schets.Getekendelijst.RemoveAt(i);
-                        s.tekenuitlijst(s.MaakBitmapGraphics());
-                        s.Refresh();
-                    }
-                    return;
-                case ("cirkel"):
-                    beginpunt = s.Schets.Getekendelijst[i].beginpunt;
-                    eindpunt = s.Schets.Getekendelijst[i].eindpunt;
-                    if (p.X > beginpunt.X && p.X < eindpunt.X && p.Y > beginpunt.Y && p.Y < eindpunt.Y)
-                    {
-                        s.Schets.Getekendelijst.RemoveAt(i);
-                        s.tekenuitlijst(s.MaakBitmapGraphics());
-                        s.Refresh();
-
-                    }
-                    return;
-                case ("vlak"):
-                    hetzelfde:
-                    beginpunt = s.Schets.Getekendelijst[i].beginpunt;
-                    eindpunt = s.Schets.Getekendelijst[i].eindpunt;
-                    if (p.X > beginpunt.X && p.X < eindpunt.X && p.Y > beginpunt.Y && p.Y < eindpunt.Y)
-                    {
-                        s.Schets.Getekendelijst.RemoveAt(i);
-                        s.tekenuitlijst(s.MaakBitmapGraphics());
-                        s.Refresh();
-                    }
-                    return;
-                case ("volcirkel"):
-                    beginpunt = s.Schets.Getekendelijst[i].beginpunt;
-                    eindpunt = s.Schets.Getekendelijst[i].eindpunt;
-                    if (Raak(soort, beginpunt, eindpunt, p))
-                    {
-                        s.Schets.Getekendelijst.RemoveAt(i);
-                        s.tekenuitlijst(s.MaakBitmapGraphics());
-                        s.Refresh();
-                    }
-                    return;
-                case ("lijn"):
-                return;
-                case ("pen"):
-                return;
-
-                case ("tekst"):
-                    goto hetzelfde;
+                s.Schets.Getekendelijst.RemoveAt(i);
+                s.tekenuitlijst(s.MaakBitmapGraphics());
+                s.Refresh();
             }
         }
         
