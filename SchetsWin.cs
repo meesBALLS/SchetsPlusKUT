@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.DirectoryServices;
 using System.Drawing;
 using System.Windows.Forms;
 public class SchetsWin : Form
@@ -197,5 +198,7 @@ private void opslaan(object obj, EventArgs ea)
         foreach (string k in kleuren)
             cbb.Items.Add(k);
         cbb.SelectedIndex = 0;
+        
+        
     }
 }

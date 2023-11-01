@@ -5,14 +5,20 @@ using System.Drawing;
 public class Schets
 {
     public Bitmap bitmap;
+    public List<GetekendObject> getekendelijst;
         
     public Schets()
     {
         bitmap = new Bitmap(1, 1);
+        getekendelijst = new List<GetekendObject>();
     }
     public Graphics BitmapGraphics
     {
         get { return Graphics.FromImage(bitmap); }
+    }
+    public List<GetekendObject> Getekendelijst
+    {
+        get { return getekendelijst; }
     }
     public void VeranderAfmeting(Size sz)
     {

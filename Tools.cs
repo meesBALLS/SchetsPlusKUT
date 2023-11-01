@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
+using System.Linq.Expressions;
 
 public interface ISchetsTool
 {
@@ -25,6 +28,26 @@ public abstract class StartpuntTool : ISchetsTool
     public abstract void Letter(SchetsControl s, char c);
 }
 
+public struct GetekendObject
+{
+    public string soort;
+    public Point beginpunt;
+    public Point eindpunt;
+    public Color kleur;
+    public string tekst;
+    public GetekendObject(String soort, Point beginpunt, Point eindpunt, Color kleur, String tekst=null)
+    {
+        this.soort = soort;
+        this.beginpunt = beginpunt;
+        this.eindpunt = eindpunt;
+        this.kleur = kleur;
+        this.tekst = tekst;
+    }
+
+    public override string ToString() {return this.soort + ", " + this.beginpunt + ", " + this.eindpunt + ", " + this.kleur + ", " + this.tekst;}
+}
+
+
 public class TekstTool : StartpuntTool
 {
     public override string ToString() { return "tekst"; }
@@ -33,6 +56,7 @@ public class TekstTool : StartpuntTool
 
     public override void Letter(SchetsControl s, char c)
     {
+
         if (c >= 32)
         {
             Graphics gr = s.MaakBitmapGraphics();
@@ -42,7 +66,13 @@ public class TekstTool : StartpuntTool
             gr.MeasureString(tekst, font, this.startpunt, StringFormat.GenericTypographic);
             gr.DrawString   (tekst, font, kwast, 
                                             this.startpunt, StringFormat.GenericTypographic);
-            // gr.DrawRectangle(Pens.Black, startpunt.X, startpunt.Y, sz.Width, sz.Height);
+            s.Schets.getekendelijst.Add(new GetekendObject(this.ToString(), this.startpunt, Point.Add(this.startpunt, sz.ToSize()), s.PenKleur, tekst));
+            //for (int i = 0; i < s.Schets.getekendelijst.Count; i++)
+            //{
+            //    Console.WriteLine(s.Schets.getekendelijst[i]);
+            //}
+            //Console.WriteLine("\n");
+            //gr.DrawRectangle(Pens.Black, startpunt.X, startpunt.Y, sz.Width, sz.Height);
             startpunt.X += (int)sz.Width;
             s.Invalidate();
         }
@@ -72,6 +102,13 @@ public abstract class TweepuntTool : StartpuntTool
     }
     public override void MuisLos(SchetsControl s, Point p)
     {   base.MuisLos(s, p);
+        s.Schets.getekendelijst.Add(new GetekendObject(this.ToString(), this.startpunt, p, s.PenKleur));
+        
+        //for (int i = 0; i < s.Schets.getekendelijst.Count; i++)
+        //{
+        //    Console.WriteLine(s.Schets.getekendelijst[i]);
+        //}
+        //Console.WriteLine("\n");
         this.Compleet(s.MaakBitmapGraphics(), this.startpunt, p);
         s.Invalidate();
     }
@@ -146,5 +183,12 @@ public class GumTool : PenTool
 
     public override void Bezig(Graphics g, Point p1, Point p2)
     {   g.DrawLine(MaakPen(Brushes.White, 7), p1, p2);
+    }
+
+    public override void MuisLos(SchetsControl s, Point p)
+    {
+        base.MuisLos(s, p);
+        // schrijf hier de logica voor het verwijderen van een object en die daaronder opnieuw tekenen
+        // dit kan met een for loop die door de getekendelijst loopt en het object verwijderd waar p in zit of erg dichtbij is
     }
 }
