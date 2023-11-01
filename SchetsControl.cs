@@ -27,6 +27,11 @@ public class SchetsControl : UserControl
     private void teken(object o, PaintEventArgs pea)
     {   schets.Teken(pea.Graphics);
     }
+
+    public void tekenuitlijst(Graphics gr)
+    {   schets.TekenUitLijst(gr);
+    }
+
     private void veranderAfmeting(object o, EventArgs ea)
     {   schets.VeranderAfmeting(this.ClientSize);
         this.Invalidate();

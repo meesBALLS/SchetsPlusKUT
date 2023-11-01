@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq.Expressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 public interface ISchetsTool
 {
@@ -35,7 +36,7 @@ public struct GetekendObject
     public Point eindpunt;
     public Color kleur;
     public string tekst;
-    public GetekendObject(String soort, Point beginpunt, Point eindpunt, Color kleur, String tekst=null)
+    public GetekendObject(string soort, Point beginpunt, Point eindpunt, Color kleur, string tekst=null)
     {
         this.soort = soort;
         this.beginpunt = beginpunt;
@@ -184,40 +185,108 @@ public class GumTool : PenTool
     public override void Bezig(Graphics g, Point p1, Point p2)
     {    }
 
+    public int PuntLijnAfstand(Point p1, Point p2, Point p)
+    {
+        int x1 = p1.X;
+        int y1 = p1.Y;
+        int x2 = p2.X;
+        int y2 = p2.Y;
+        int x = p.X;
+        int y = p.Y;
+
+        int boven = Math.Abs((x2-x1)*(y1-y)-(x1-x)*(y2-y1));
+        int onder = (int)Math.Sqrt(Math.Pow(y2 - y1, 2) + Math.Pow(x2 - x1, 2));
+        return boven / onder;
+    }
+
+    public bool Raak(string soort, Point begin, Point eind, Point p)
+    {
+        switch (soort)
+        {
+            case ("kader"):
+
+            case ("vlak"):
+                return (p.X > begin.X && p.X < eind.X && p.Y > begin.Y && p.Y < eind.Y);
+            case ("volcirkel"):
+                double radiusx = Math.Abs((double)eind.X - (double)begin.X) / 2.0;
+                double radiusy = Math.Abs((double)eind.Y - (double)begin.Y) / 2.0;
+                double midpointx = ((double)begin.X + (double)eind.X) / 2.0;
+                double midpointy = ((double)begin.Y + (double)eind.Y) / 2.0;
+
+                return ((Math.Pow((p.X - midpointx) / radiusx, 2) + Math.Pow((p.Y - midpointy) / radiusy, 2)) <= 1.0);
+            case ("lijn"):
+                sameshit:
+                int afstand = (int)PuntLijnAfstand(begin, eind, p);
+                return (afstand <= 5);
+
+            case ("pen"):
+                goto sameshit;
+            default:
+                return false;
+        }
+    }
+
     public override void MuisLos(SchetsControl s, Point p)
     {
         // schrijf hier de logica voor het verwijderen van een object en die daaronder opnieuw tekenen
         // dit kan met een for loop die door de getekendelijst loopt en het object verwijderd waar p in zit of erg dichtbij is
         for (int i = 0; i < s.Schets.Getekendelijst.Count; i++)
         {
-            string[] splitString = s.Schets.Getekendelijst[i].ToString().Split(",");
-            string soort = splitString[0];
+            string soort = s.Schets.getekendelijst[i].soort;
             switch (soort)
             {
                 case ("kader"):
-                    Point beginpunt = new Point(Convert.ToInt32(splitString[1].Split("{")[1].Split("=")[1]), Convert.ToInt32(splitString[2].Split("}")[0].Split("=")[1]));
-                    Point eindpunt = new Point(Convert.ToInt32(splitString[3].Split("{")[1].Split("=")[1]), Convert.ToInt32(splitString[4].Split("}")[0].Split("=")[1]));
-                    if (p.X > beginpunt.X && p.X < eindpunt.X && p.Y > beginpunt.Y && p.Y < eindpunt.Y)
+                    Point beginpunt = s.Schets.Getekendelijst[i].beginpunt;
+                    Point eindpunt = s.Schets.Getekendelijst[i].eindpunt;
+
+                    if (Raak(soort, beginpunt, eindpunt, p))
                     {
                         s.Schets.Getekendelijst.RemoveAt(i);
+                        s.tekenuitlijst(s.MaakBitmapGraphics());
                         s.Refresh();
-                        s.Invalidate();
                     }
-                    break;
+                    return;
                 case ("cirkel"):
-                    beginpunt = new Point(Convert.ToInt32(splitString[1].Split("{")[1].Split("=")[1]), Convert.ToInt32(splitString[2].Split("}")[0].Split("=")[1]));
-                    eindpunt = new Point(Convert.ToInt32(splitString[3].Split("{")[1].Split("=")[1]), Convert.ToInt32(splitString[4].Split("}")[0].Split("=")[1]));
+                    beginpunt = s.Schets.Getekendelijst[i].beginpunt;
+                    eindpunt = s.Schets.Getekendelijst[i].eindpunt;
                     if (p.X > beginpunt.X && p.X < eindpunt.X && p.Y > beginpunt.Y && p.Y < eindpunt.Y)
                     {
                         s.Schets.Getekendelijst.RemoveAt(i);
+                        s.tekenuitlijst(s.MaakBitmapGraphics());
                         s.Refresh();
-                        s.Invalidate();
+
                     }
-                    break;  
-                default:
-                    break;
+                    return;
+                case ("vlak"):
+                    hetzelfde:
+                    beginpunt = s.Schets.Getekendelijst[i].beginpunt;
+                    eindpunt = s.Schets.Getekendelijst[i].eindpunt;
+                    if (p.X > beginpunt.X && p.X < eindpunt.X && p.Y > beginpunt.Y && p.Y < eindpunt.Y)
+                    {
+                        s.Schets.Getekendelijst.RemoveAt(i);
+                        s.tekenuitlijst(s.MaakBitmapGraphics());
+                        s.Refresh();
+                    }
+                    return;
+                case ("volcirkel"):
+                    beginpunt = s.Schets.Getekendelijst[i].beginpunt;
+                    eindpunt = s.Schets.Getekendelijst[i].eindpunt;
+                    if (Raak(soort, beginpunt, eindpunt, p))
+                    {
+                        s.Schets.Getekendelijst.RemoveAt(i);
+                        s.tekenuitlijst(s.MaakBitmapGraphics());
+                        s.Refresh();
+                    }
+                    return;
+                case ("lijn"):
+                return;
+                case ("pen"):
+                return;
+
+                case ("tekst"):
+                    goto hetzelfde;
             }
         }
-        s.Schets.TekenUitLijst(s.CreateGraphics());
+        
     }
 }

@@ -39,16 +39,16 @@ public class Schets
     }
     public void TekenUitLijst(Graphics gr)
     {
-        this.Schoon();
+        gr.FillRectangle(Brushes.White, 0, 0, bitmap.Width, bitmap.Height);
         for (int i = 0; i < getekendelijst.Count; i++)
         {
             switch (getekendelijst[i].soort)
             {
                 case ("kader"):
-                    gr.DrawRectangle(new Pen(getekendelijst[i].kleur), TweepuntTool.Punten2Rechthoek(getekendelijst[i].beginpunt, getekendelijst[i].eindpunt));
+                    gr.DrawRectangle(new Pen(getekendelijst[i].kleur,3), TweepuntTool.Punten2Rechthoek(getekendelijst[i].beginpunt, getekendelijst[i].eindpunt));
                     break;
                 case ("cirkel"):
-                    gr.DrawEllipse(new Pen(getekendelijst[i].kleur), TweepuntTool.Punten2Rechthoek(getekendelijst[i].beginpunt, getekendelijst[i].eindpunt));
+                    gr.DrawEllipse(new Pen(getekendelijst[i].kleur,3), TweepuntTool.Punten2Rechthoek(getekendelijst[i].beginpunt, getekendelijst[i].eindpunt));
                     break;
                 case ("vlak"):
                     gr.FillRectangle(new SolidBrush(getekendelijst[i].kleur), TweepuntTool.Punten2Rechthoek(getekendelijst[i].beginpunt, getekendelijst[i].eindpunt));
@@ -57,10 +57,15 @@ public class Schets
                     gr.FillEllipse(new SolidBrush(getekendelijst[i].kleur), TweepuntTool.Punten2Rechthoek(getekendelijst[i].beginpunt, getekendelijst[i].eindpunt));
                     break;
                 case ("lijn"):
-                    gr.DrawLine(new Pen(getekendelijst[i].kleur), getekendelijst[i].beginpunt, getekendelijst[i].eindpunt);
+                    gr.DrawLine(new Pen(getekendelijst[i].kleur, 3), getekendelijst[i].beginpunt, getekendelijst[i].eindpunt);
                     break;
                 case ("pen"):
-                    gr.DrawLine(new Pen(getekendelijst[i].kleur), getekendelijst[i].beginpunt, getekendelijst[i].eindpunt);
+                    gr.DrawLine(new Pen(getekendelijst[i].kleur, 3), getekendelijst[i].beginpunt, getekendelijst[i].eindpunt);
+                    break;
+                case ("tekst"):
+                    Font font = new Font("Tahoma", 40);
+                    gr.MeasureString(getekendelijst[i].tekst, font, getekendelijst[i].beginpunt, StringFormat.GenericTypographic);
+                    gr.DrawString(getekendelijst[i].tekst, font, new SolidBrush(getekendelijst[i].kleur), getekendelijst[i].beginpunt, StringFormat.GenericTypographic);
                     break;
             }
         }
@@ -69,6 +74,7 @@ public class Schets
     {
         Graphics gr = Graphics.FromImage(bitmap);
         gr.FillRectangle(Brushes.White, 0, 0, bitmap.Width, bitmap.Height);
+        getekendelijst.Clear();
     }
     public void Roteer()
     {
