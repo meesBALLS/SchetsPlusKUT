@@ -37,6 +37,34 @@ public class Schets
     {
         gr.DrawImage(bitmap, 0, 0);
     }
+    public void TekenUitLijst(Graphics gr)
+    {
+        this.Schoon();
+        for (int i = 0; i < getekendelijst.Count; i++)
+        {
+            switch (getekendelijst[i].soort)
+            {
+                case ("kader"):
+                    gr.DrawRectangle(new Pen(getekendelijst[i].kleur), TweepuntTool.Punten2Rechthoek(getekendelijst[i].beginpunt, getekendelijst[i].eindpunt));
+                    break;
+                case ("cirkel"):
+                    gr.DrawEllipse(new Pen(getekendelijst[i].kleur), TweepuntTool.Punten2Rechthoek(getekendelijst[i].beginpunt, getekendelijst[i].eindpunt));
+                    break;
+                case ("vlak"):
+                    gr.FillRectangle(new SolidBrush(getekendelijst[i].kleur), TweepuntTool.Punten2Rechthoek(getekendelijst[i].beginpunt, getekendelijst[i].eindpunt));
+                    break;
+                case ("volcirkel"):
+                    gr.FillEllipse(new SolidBrush(getekendelijst[i].kleur), TweepuntTool.Punten2Rechthoek(getekendelijst[i].beginpunt, getekendelijst[i].eindpunt));
+                    break;
+                case ("lijn"):
+                    gr.DrawLine(new Pen(getekendelijst[i].kleur), getekendelijst[i].beginpunt, getekendelijst[i].eindpunt);
+                    break;
+                case ("pen"):
+                    gr.DrawLine(new Pen(getekendelijst[i].kleur), getekendelijst[i].beginpunt, getekendelijst[i].eindpunt);
+                    break;
+            }
+        }
+    }
     public void Schoon()
     {
         Graphics gr = Graphics.FromImage(bitmap);

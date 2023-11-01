@@ -182,13 +182,42 @@ public class GumTool : PenTool
     public override string ToString() { return "gum"; }
 
     public override void Bezig(Graphics g, Point p1, Point p2)
-    {   g.DrawLine(MaakPen(Brushes.White, 7), p1, p2);
-    }
+    {    }
 
     public override void MuisLos(SchetsControl s, Point p)
     {
-        base.MuisLos(s, p);
         // schrijf hier de logica voor het verwijderen van een object en die daaronder opnieuw tekenen
         // dit kan met een for loop die door de getekendelijst loopt en het object verwijderd waar p in zit of erg dichtbij is
+        for (int i = 0; i < s.Schets.Getekendelijst.Count; i++)
+        {
+            string[] splitString = s.Schets.Getekendelijst[i].ToString().Split(",");
+            string soort = splitString[0];
+            switch (soort)
+            {
+                case ("kader"):
+                    Point beginpunt = new Point(Convert.ToInt32(splitString[1].Split("{")[1].Split("=")[1]), Convert.ToInt32(splitString[2].Split("}")[0].Split("=")[1]));
+                    Point eindpunt = new Point(Convert.ToInt32(splitString[3].Split("{")[1].Split("=")[1]), Convert.ToInt32(splitString[4].Split("}")[0].Split("=")[1]));
+                    if (p.X > beginpunt.X && p.X < eindpunt.X && p.Y > beginpunt.Y && p.Y < eindpunt.Y)
+                    {
+                        s.Schets.Getekendelijst.RemoveAt(i);
+                        s.Refresh();
+                        s.Invalidate();
+                    }
+                    break;
+                case ("cirkel"):
+                    beginpunt = new Point(Convert.ToInt32(splitString[1].Split("{")[1].Split("=")[1]), Convert.ToInt32(splitString[2].Split("}")[0].Split("=")[1]));
+                    eindpunt = new Point(Convert.ToInt32(splitString[3].Split("{")[1].Split("=")[1]), Convert.ToInt32(splitString[4].Split("}")[0].Split("=")[1]));
+                    if (p.X > beginpunt.X && p.X < eindpunt.X && p.Y > beginpunt.Y && p.Y < eindpunt.Y)
+                    {
+                        s.Schets.Getekendelijst.RemoveAt(i);
+                        s.Refresh();
+                        s.Invalidate();
+                    }
+                    break;  
+                default:
+                    break;
+            }
+        }
+        s.Schets.TekenUitLijst(s.CreateGraphics());
     }
 }
