@@ -267,7 +267,7 @@ public class GumTool : PenTool
 
     public override void MuisLos(SchetsControl s, Point p)
     {
-        for (int i = 0; i < s.Schets.Getekendelijst.Count; i++)
+        for (int i = s.Schets.Getekendelijst.Count-1; i >=0; i--)
         {
             string soort = s.Schets.getekendelijst[i].soort;
             Point beginpunt = s.Schets.Getekendelijst[i].beginpunt;
@@ -278,6 +278,7 @@ public class GumTool : PenTool
                 s.Schets.Getekendelijst.RemoveAt(i);
                 s.tekenuitlijst(s.MaakBitmapGraphics());
                 s.Refresh();
+                break;
             }
         }
         
