@@ -54,7 +54,7 @@ public class SchetsEditor : Form
     }
     private void Open(object sender, EventArgs e)
     {
-        Console.WriteLine("Open");
+
         OpenFileDialog openFileDialog = new OpenFileDialog();
         openFileDialog.Title = "Open an existing text file";
         openFileDialog.Filter = "Text Files|*.txt|All Files|*.*";
@@ -71,7 +71,8 @@ public class SchetsEditor : Form
                     using (System.IO.StreamReader reader = new System.IO.StreamReader(filePath))
                     {
                         string line;
-                        
+                        Schets schets = new Schets();
+
                         while ((line = reader.ReadLine()) != null)
                         {
                             string[] sub_line = line.Split(',');
@@ -88,21 +89,23 @@ public class SchetsEditor : Form
                             string[] parts = line.Split(" ");
                             Console.WriteLine(parts);
                             string type = parts[0];
-                           
+
                             int x1 = int.Parse(parts[2]);
                             int y1 = int.Parse(parts[3]);
-                            int x2 = int.Parse(parts[5]);   
+                            int x2 = int.Parse(parts[5]);
                             int y2 = int.Parse(parts[6]); 
                             
-
                             Color color = Color.FromName(parts[8]);
                             /*dit doen we omdat er spaties in de file staan, en we die willen we niet gebuiken*/
                             Point p = new Point(x1, y1);
                             Point q = new Point(x2, y2);
-                            
-                            Schets.getekendelijst.Add(new GetekendObject(type, p, q, color));
+
+                            schets.getekendelijst.Add(new GetekendObject(type, p, q, color));
                         }
+                        schets.tekenuitlijst(schets.MaakBitmapGraphics());
+                        schets.Refresh();
                     }
+                    
                 }
                 catch (Exception ex)
                 {
@@ -115,5 +118,7 @@ public class SchetsEditor : Form
             }
         }
     }
+
+  
 
 }
