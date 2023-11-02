@@ -71,10 +71,13 @@ public class SchetsEditor : Form
                     using (System.IO.StreamReader reader = new System.IO.StreamReader(filePath))
                     {
                         string line;
+                        
                         while ((line = reader.ReadLine()) != null)
                         {
-                            
-                            string[] charsToRemove = new string[] { "{X=", "Y=", "}", ",",  "Color [", "]" };
+                            string[] sub_line = line.Split(',');
+                            line = string.Join(" ", sub_line);
+
+                            string[] charsToRemove = new string[] { "{X=", "Y=", "}", "Color [", "]" };
 
                             foreach (string s in charsToRemove)
                             {
@@ -82,23 +85,22 @@ public class SchetsEditor : Form
                             }
 
                             
-                            string[] parts = line.Split(' ');
+                            string[] parts = line.Split(" ");
                             Console.WriteLine(parts);
                             string type = parts[0];
                            
-                            int x1 = int.Parse(parts[1]);
-                            int y1 = int.Parse(parts[2]);
-                            int x2 = 10;
-                            int y2 = int.Parse(parts[4]);
-
+                            int x1 = int.Parse(parts[2]);
+                            int y1 = int.Parse(parts[3]);
+                            int x2 = int.Parse(parts[5]);   
+                            int y2 = int.Parse(parts[6]); 
                             
-                            
-                            Color color = Color.FromName("Black");
 
+                            Color color = Color.FromName(parts[8]);
+                            /*dit doen we omdat er spaties in de file staan, en we die willen we niet gebuiken*/
                             Point p = new Point(x1, y1);
                             Point q = new Point(x2, y2);
                             
-                            schetscontrol.Schets.getekendelijst.Add(new GetekendObject(type, p, q, color));
+                            Schets.getekendelijst.Add(new GetekendObject(type, p, q, color));
                         }
                     }
                 }
