@@ -1,10 +1,12 @@
 using System;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 
 public class SchetsEditor : Form
 {
     private MenuStrip menuStrip;
+    SchetsControl schetscontrol;
 
     public SchetsEditor()
     {   
@@ -22,6 +24,7 @@ public class SchetsEditor : Form
         ToolStripDropDownItem menu = new ToolStripMenuItem("File");
         menu.DropDownItems.Add("Nieuw", null, this.nieuw);
         menu.DropDownItems.Add("Exit", null, this.afsluiten);
+        menu.DropDownItems.Add("Open", null, this.Open);
         menuStrip.Items.Add(menu);
     }
     private void maakHelpMenu()
@@ -49,4 +52,66 @@ public class SchetsEditor : Form
     {   
         this.Close();
     }
+    private void Open(object sender, EventArgs e)
+    {
+        Console.WriteLine("Open");
+        OpenFileDialog openFileDialog = new OpenFileDialog();
+        openFileDialog.Title = "Open an existing text file";
+        openFileDialog.Filter = "Text Files|*.txt|All Files|*.*";
+
+        if (openFileDialog.ShowDialog() == DialogResult.OK)
+        {
+            string filePath = openFileDialog.FileName;
+
+            this.nieuw(sender, e);
+            if (System.IO.File.Exists(filePath))
+            {
+                try
+                {
+                    using (System.IO.StreamReader reader = new System.IO.StreamReader(filePath))
+                    {
+                        string line;
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            
+                            string[] charsToRemove = new string[] { "{X=", "Y=", "}", ",",  "Color [", "]" };
+
+                            foreach (string s in charsToRemove)
+                            {
+                                line = line.Replace(s, "");
+                            }
+
+                            
+                            string[] parts = line.Split(' ');
+                            Console.WriteLine(parts);
+                            string type = parts[0];
+                           
+                            int x1 = int.Parse(parts[1]);
+                            int y1 = int.Parse(parts[2]);
+                            int x2 = 10;
+                            int y2 = int.Parse(parts[4]);
+
+                            
+                            
+                            Color color = Color.FromName("Black");
+
+                            Point p = new Point(x1, y1);
+                            Point q = new Point(x2, y2);
+                            
+                            schetscontrol.Schets.getekendelijst.Add(new GetekendObject(type, p, q, color));
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("An error occurred: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show("File does not exist.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+    }
+
 }

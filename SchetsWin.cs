@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.DirectoryServices;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 public class SchetsWin : Form
-{   
+{
     MenuStrip menuStrip;
     SchetsControl schetscontrol;
     ISchetsTool huidigeTool;
@@ -14,7 +15,7 @@ public class SchetsWin : Form
 
     private void veranderAfmeting(object o, EventArgs ea)
     {
-        schetscontrol.Size = new Size ( this.ClientSize.Width  - 70
+        schetscontrol.Size = new Size(this.ClientSize.Width - 70
                                       , this.ClientSize.Height - 50);
         paneel.Location = new Point(64, this.ClientSize.Height - 30);
     }
@@ -34,10 +35,10 @@ public class SchetsWin : Form
         this.Close();
     }
 
-private void opslaan(object obj, EventArgs ea)
+    private void opslaan(object obj, EventArgs ea)
     {
         SaveFileDialog saveFileDialog1 = new SaveFileDialog();
-        saveFileDialog1.Filter = "Bitmap Image|*.bmp|JPEG Image|*.jpg|PNG Image|*.png";
+        saveFileDialog1.Filter = "Bitmap Image|*.bmp|JPEG Image|*.jpg|PNG Image|*.png|Text File|*.txt";
         saveFileDialog1.Title = "Sla je plaatje op";
         saveFileDialog1.ShowDialog();
 
@@ -61,11 +62,26 @@ private void opslaan(object obj, EventArgs ea)
                     this.schetscontrol.Schets.bitmap.Save(fs,
                        System.Drawing.Imaging.ImageFormat.Png);
                     break;
+                case 4:
+
+                    if (this.schetscontrol.Schets != null)
+                    {
+                        // Write the Getekendelijst to a text file
+                        using (StreamWriter writer = new StreamWriter(fs))
+                        {
+                            foreach (GetekendObject item in this.schetscontrol.Schets.Getekendelijst)
+                            {
+                                writer.WriteLine(item.ToString());
+                            }
+                        }
+                    }
+                    break;
             }
 
             fs.Close();
         }
     }
+
 
     public SchetsWin()
     {
