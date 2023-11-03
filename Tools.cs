@@ -248,18 +248,14 @@ public class GumTool : PenTool
             case ("cirkel"):
                 return (PuntOpEllips(p, midpointx, midpointy, radiusx, radiusy, 24/radiusx));
             case ("vlak"):
-                vlakshit:
+            case ("tekst"):
                 return (p.X > begin.X && p.X < eind.X && p.Y > begin.Y && p.Y < eind.Y);
             case ("volcirkel"):
                 return ((Math.Pow((p.X - midpointx) / radiusx, 2) + Math.Pow((p.Y - midpointy) / radiusy, 2)) <= 1.0);
             case ("lijn"):
-                sameshit:
+            case ("pen"):
                 Console.WriteLine(afstand);
                 return (afstand <= 8);
-            case ("pen"):
-                goto sameshit;
-            case ("tekst"):
-                goto vlakshit;
             default:
                 return false;
         }

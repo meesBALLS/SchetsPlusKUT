@@ -23,9 +23,9 @@ public class SchetsEditor : Form
     private void maakFileMenu()
     {   
         ToolStripDropDownItem menu = new ToolStripMenuItem("File");
+        menu.DropDownItems.Add("Open", null, this.open);
         menu.DropDownItems.Add("Nieuw", null, this.nieuw);
         menu.DropDownItems.Add("Exit", null, this.afsluiten);
-        menu.DropDownItems.Add("Open", null, this.open);
         menuStrip.Items.Add(menu);
     }
     private void maakHelpMenu()

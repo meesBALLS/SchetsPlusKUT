@@ -37,7 +37,7 @@ public class SchetsWin : Form
 
     public void Open(object sender, EventArgs e)
     {
-
+       
         OpenFileDialog openFileDialog = new OpenFileDialog();
         openFileDialog.Title = "Open an existing text file";
         openFileDialog.Filter = "Text Files|*.txt|All Files|*.*";
@@ -45,21 +45,21 @@ public class SchetsWin : Form
         if (openFileDialog.ShowDialog() == DialogResult.OK)
         {
             string filePath = openFileDialog.FileName;
-
+            
             if (File.Exists(filePath))
             {
+                //filePath = Path.ChangeExtension(filePath, ".txt");
                 try
                 {
                     using (StreamReader reader = new StreamReader(filePath))
                     {
                         string line;
-
+                        
 
                         while ((line = reader.ReadLine()) != null)
                         {
                             string[] sub_line = line.Split(',');
                             line = string.Join(" ", sub_line);
-
                             string[] charsToRemove = new string[] { "{X=", "Y=", "}", "Color [", "]" };
 
                             foreach (string s in charsToRemove)
@@ -131,10 +131,9 @@ public class SchetsWin : Form
                        System.Drawing.Imaging.ImageFormat.Png);
                     break;
                 case 4:
-
-                    if (this.schetscontrol.Schets != null)
+                    try
                     {
-                        // Write the Getekendelijst to a text file
+                        // Write the Getekendelijst to a text file with .KUT extension
                         using (StreamWriter writer = new StreamWriter(fs))
                         {
                             foreach (GetekendObject item in this.schetscontrol.Schets.Getekendelijst)
@@ -143,6 +142,12 @@ public class SchetsWin : Form
                             }
                         }
                     }
+                    catch (System.IO.IOException ex)
+                    {
+                        Console.WriteLine("The file could not be accessed because it is being used by another process.");
+                    }
+                    
+                    
                     break;
             }
 
@@ -204,7 +209,7 @@ public class SchetsWin : Form
     {   
         ToolStripMenuItem menu = new ToolStripMenuItem("File");
         menu.MergeAction = MergeAction.MatchOnly;
-        menu.DropDownItems.Add("opslaan", null, this.opslaan);
+        menu.DropDownItems.Add("Opslaan", null, this.opslaan);
         menu.DropDownItems.Add("Sluiten", null, this.afsluiten);
         menuStrip.Items.Add(menu);
     }
