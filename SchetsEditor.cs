@@ -6,7 +6,8 @@ using System.Windows.Forms;
 public class SchetsEditor : Form
 {
     private MenuStrip menuStrip;
-    SchetsControl schetscontrol;
+    private SchetsControl schetscontrol= new SchetsControl();
+ 
 
     public SchetsEditor()
     {   
@@ -71,7 +72,7 @@ public class SchetsEditor : Form
                     using (System.IO.StreamReader reader = new System.IO.StreamReader(filePath))
                     {
                         string line;
-                        Schets schets = new Schets();
+                        
 
                         while ((line = reader.ReadLine()) != null)
                         {
@@ -100,10 +101,10 @@ public class SchetsEditor : Form
                             Point p = new Point(x1, y1);
                             Point q = new Point(x2, y2);
 
-                            schets.getekendelijst.Add(new GetekendObject(type, p, q, color));
+                            schetscontrol.Schets.getekendelijst.Add(new GetekendObject(type, p, q, color));
+
                         }
-                        schets.tekenuitlijst(schets.MaakBitmapGraphics());
-                        schets.Refresh();
+                        schetscontrol.Schets.TekenUitLijst(schetscontrol.CreateGraphics());
                     }
                     
                 }
@@ -116,6 +117,8 @@ public class SchetsEditor : Form
             {
                 MessageBox.Show("File does not exist.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+
+
         }
     }
 
