@@ -57,7 +57,6 @@ public class TekstTool : StartpuntTool
 
     public override void Letter(SchetsControl s, char c)
     {
-
         if (c >= 32)
         {
             Graphics gr = s.MaakBitmapGraphics();
@@ -68,11 +67,7 @@ public class TekstTool : StartpuntTool
             gr.DrawString   (tekst, font, kwast, 
                                             this.startpunt, StringFormat.GenericTypographic);
             s.Schets.getekendelijst.Add(new GetekendObject(this.ToString(), this.startpunt, Point.Add(this.startpunt, sz.ToSize()), s.PenKleur, tekst));
-            //for (int i = 0; i < s.Schets.getekendelijst.Count; i++)
-            //{
-            //    Console.WriteLine(s.Schets.getekendelijst[i]);
-            //}
-            //Console.WriteLine("\n");
+            
             //gr.DrawRectangle(Pens.Black, startpunt.X, startpunt.Y, sz.Width, sz.Height);
             startpunt.X += (int)sz.Width;
             s.Invalidate();
@@ -104,12 +99,7 @@ public abstract class TweepuntTool : StartpuntTool
     public override void MuisLos(SchetsControl s, Point p)
     {   base.MuisLos(s, p);
         s.Schets.getekendelijst.Add(new GetekendObject(this.ToString(), this.startpunt, p, s.PenKleur));
-        
-        //for (int i = 0; i < s.Schets.getekendelijst.Count; i++)
-        //{
-        //    Console.WriteLine(s.Schets.getekendelijst[i]);
-        //}
-        //Console.WriteLine("\n");
+
         this.Compleet(s.MaakBitmapGraphics(), this.startpunt, p);
         s.Invalidate();
     }
@@ -193,14 +183,27 @@ public class GumTool : PenTool
         int y2 = p2.Y;
         int x = p.X;
         int y = p.Y;
+        int tolerantie = 10;
 
         int boven = Math.Abs((x2-x1)*(y1-y)-(x1-x)*(y2-y1));
         int onder = (int)Math.Sqrt(Math.Pow(y2 - y1, 2) + Math.Pow(x2 - x1, 2));
+
         if (onder == 0)
         {
             onder = 1;
         }
-        return boven / onder;
+        else {; }
+
+        if ((x < x1 + tolerantie && x > x2 - tolerantie) || (x < x2 + tolerantie && x > x1 - tolerantie))
+        {
+            if ((y < y1 + tolerantie && y > y2 - tolerantie) || (y < y2 + 1 && y > y1 - tolerantie))
+                return boven / onder;
+            else {  return 100;}
+        }
+        else
+        {
+            return 100;
+        }
     }
 
     public bool PuntOpEllips(Point p, double middenx, double middeny, double radiusx, double radiusy, double delta)
@@ -248,14 +251,18 @@ public class GumTool : PenTool
             case ("cirkel"):
                 return (PuntOpEllips(p, midpointx, midpointy, radiusx, radiusy, 24/radiusx));
             case ("vlak"):
-            case ("tekst"):
+                vlakshit:
                 return (p.X > begin.X && p.X < eind.X && p.Y > begin.Y && p.Y < eind.Y);
             case ("volcirkel"):
                 return ((Math.Pow((p.X - midpointx) / radiusx, 2) + Math.Pow((p.Y - midpointy) / radiusy, 2)) <= 1.0);
             case ("lijn"):
-            case ("pen"):
+                sameshit:
                 Console.WriteLine(afstand);
                 return (afstand <= 8);
+            case ("pen"):
+                goto sameshit;
+            case ("tekst"):
+                goto vlakshit;
             default:
                 return false;
         }
@@ -263,15 +270,15 @@ public class GumTool : PenTool
 
     public override void MuisLos(SchetsControl s, Point p)
     {
-        for (int i = s.Schets.Getekendelijst.Count-1; i > -1; i--)
+        for (int i = s.Schets.getekendelijst.Count-1; i >=0; i--)
         {
             string soort = s.Schets.getekendelijst[i].soort;
-            Point beginpunt = s.Schets.Getekendelijst[i].beginpunt;
-            Point eindpunt = s.Schets.Getekendelijst[i].eindpunt;
+            Point beginpunt = s.Schets.getekendelijst[i].beginpunt;
+            Point eindpunt = s.Schets.getekendelijst[i].eindpunt;
 
             if (Raak(soort, beginpunt, eindpunt, p))
             {
-                s.Schets.Getekendelijst.RemoveAt(i);
+                s.Schets.getekendelijst.RemoveAt(i);
                 s.tekenuitlijst(s.MaakBitmapGraphics());
                 s.Refresh();
                 break;

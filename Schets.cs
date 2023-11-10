@@ -16,10 +16,6 @@ public class Schets
     {
         get { return Graphics.FromImage(bitmap); }
     }
-    public List<GetekendObject> Getekendelijst
-    {
-        get { return getekendelijst; }
-    }
     public void VeranderAfmeting(Size sz)
     {
         if (sz.Width > bitmap.Size.Width || sz.Height > bitmap.Size.Height)
@@ -57,6 +53,8 @@ public class Schets
                     gr.FillEllipse(new SolidBrush(getekendelijst[i].kleur), TweepuntTool.Punten2Rechthoek(getekendelijst[i].beginpunt, getekendelijst[i].eindpunt));
                     break;
                 case ("lijn"):
+                    gr.DrawLine(new Pen(getekendelijst[i].kleur, 3), getekendelijst[i].beginpunt, getekendelijst[i].eindpunt);
+                    break;
                 case ("pen"):
                     gr.DrawLine(new Pen(getekendelijst[i].kleur, 3), getekendelijst[i].beginpunt, getekendelijst[i].eindpunt);
                     break;

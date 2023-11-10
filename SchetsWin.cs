@@ -48,14 +48,13 @@ public class SchetsWin : Form
             
             if (File.Exists(filePath))
             {
-                //filePath = Path.ChangeExtension(filePath, ".txt");
+            
                 try
                 {
                     using (StreamReader reader = new StreamReader(filePath))
                     {
                         string line;
                         
-
                         while ((line = reader.ReadLine()) != null)
                         {
                             string[] sub_line = line.Split(',');
@@ -86,6 +85,7 @@ public class SchetsWin : Form
 
                         }
                         schetscontrol.tekenuitlijst(schetscontrol.MaakBitmapGraphics());
+                        schetscontrol.Invalidate();
                     }
 
                 }
@@ -98,7 +98,6 @@ public class SchetsWin : Form
             {
                 MessageBox.Show("File does not exist.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
 
         }
     }
@@ -136,7 +135,7 @@ public class SchetsWin : Form
                         // Write the Getekendelijst to a text file with .KUT extension
                         using (StreamWriter writer = new StreamWriter(fs))
                         {
-                            foreach (GetekendObject item in this.schetscontrol.Schets.Getekendelijst)
+                            foreach (GetekendObject item in this.schetscontrol.Schets.getekendelijst)
                             {
                                 writer.WriteLine(item.ToString());
                             }
@@ -172,7 +171,7 @@ public class SchetsWin : Form
         String[] alleKleuren = deKleuren.Concat(meerKleuren).ToArray();
         this.ClientSize = new Size(700, 500);
         huidigeTool = deTools[0];
-
+        
         schetscontrol = new SchetsControl();
         schetscontrol.Location = new Point(64, 10);
         schetscontrol.MouseDown += (object o, MouseEventArgs mea) =>
@@ -288,7 +287,6 @@ public class SchetsWin : Form
         foreach (string k in kleuren)
             cbb.Items.Add(k);
         cbb.SelectedIndex = 0;
-        
         
     }
 }
